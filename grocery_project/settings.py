@@ -41,6 +41,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '.ngrok-free.app',
     '.ngrok-free.dev',
+    'gudhshop-production.up.railway.app'
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.app',
