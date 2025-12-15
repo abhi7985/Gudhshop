@@ -140,9 +140,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # If you have a global static folder
-]
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),  # If you have a global static folder
+# ]
 
 # Set where static files get collected when you run collectstatic (mainly for production)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
