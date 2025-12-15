@@ -1,0 +1,112 @@
+{% extends 'store/base.html' %}
+{% load static cart_extras %}
+{% block title %}Home | GudhShop{% endblock %}
+
+{% block content %}
+
+{% if not delivery_allowed %}
+<section class="location-gate">
+  <h1 class="page-title">Check delivery in your area</h1>
+  <p>Use your current location or move the pin on the map.</p>
+
+  <button type="button" class="btn-primary" onclick="detectLocationAndShowMap()">
+    Use my current location
+  </button>
+
+  <div id="location-map"
+       style="width:100%;height:280px;margin-top:14px;border-radius:16px;"></div>
+
+  <p id="location-message" class="text-sm" style="margin-top:8px;"></p>
+</section>
+{% else %}
+  {# your existing hero + categories + product grid sections go here #}
+  ... existing home sections ...
+
+
+
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <h1 class="hero-heading">
+        Fastest Grocery<br>
+        Delivery Right to Your<br>
+        Door in Your Town!
+      </h1>
+      <p class="hero-subtitle">
+        Get your daily essentials and fresh produce delivered quickly<br>
+        and reliably. Enjoy convenience without compromise.
+      </p>
+      <div class="hero-actions">
+        <a href="{% url 'store:product_list' %}" class="btn-primary">Start Shopping</a>
+        <a href="{% url 'store:product_list' %}?category=offers" class="btn-link">View Offers</a>
+      </div>
+    </div>
+    <div class="hero-illustration">
+      <img src="{% static 'store/images/logo.png' %}" alt="Grocery delivery">
+    </div>
+  </div>
+</section>
+
+<section class="category-strip">
+  <div class="category-strip-inner">
+    <a href="{% url 'store:product_list' %}"
+       class="category-pill {% if not active_category %}active{% endif %}">
+      <div class="category-pill-icon">
+        <img src="{% static 'store/images/cat-all.png' %}" alt="All">
+      </div>
+      <span>All</span>
+    </a>
+    {% for cat in categories %}
+      <a href="{% url 'store:product_list' %}?category={{ cat.slug }}"
+         class="category-pill {% if active_category == cat.slug %}active{% endif %}">
+        <div class="category-pill-icon">
+          {% if cat.image %}
+            <img src="{{ cat.image.url }}" alt="{{ cat.name }}">
+          {% else %}
+            <img src="{% static 'store/images/cat-placeholder.png' %}" alt="{{ cat.name }}">
+          {% endif %}
+        </div>
+        <span>{{ cat.name }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="product-section">
+  <div class="product-header">
+    <h2>Shop Groceries</h2>
+  </div>
+  <div class="product-grid">
+    {% for product in products %}
+      {% with qty=cart_quantities|get_item:product.id %}
+      <article class="product-card">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+        {% else %}
+          <img src="{% static 'store/images/product-placeholder.png' %}" alt="{{ product.name }}" class="product-image">
+        {% endif %}
+        <div class="product-body">
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-unit">{{ product.unit|default:"1 pc" }}</p>
+          <div class="product-footer"
+               data-product-id="{{ product.id }}"
+               data-initial-qty="{{ qty|default:0 }}">
+            <span class="product-price">₹{{ product.price }}</span>
+            <div class="cart-control">
+              <button type="button" class="btn-add js-add-to-cart">Add</button>
+              <div class="qty-control js-qty-control">
+                <button type="button" class="qty-btn js-decrease">-</button>
+                <span class="qty-value js-qty">0</span>
+                <button type="button" class="qty-btn js-increase">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+      {% endwith %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

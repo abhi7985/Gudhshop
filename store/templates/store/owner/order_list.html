@@ -1,0 +1,59 @@
+{% extends 'store/base.html' %}
+{% block title %}Orders | Owner{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Orders</h1>
+
+<table class="owner-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Customer</th>
+      <th>Status</th>
+      <th>Delivery Person</th>
+      <th>Update</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+    <tr>
+      <td>{{ order.id }}</td>
+      <td>{{ order.user.username }}</td>
+      <td>{{ order.get_status_display }}</td>
+      <td>
+        {% if order.delivery_person %}
+          {{ order.delivery_person.user.username }}
+        {% else %}
+          -
+        {% endif %}
+      </td>
+      <td>
+        <form method="post" style="display:flex; gap:8px; align-items:center;">
+          {% csrf_token %}
+          <input type="hidden" name="order_id" value="{{ order.id }}">
+
+          <select name="status">
+            {% for key, label in order.STATUS_CHOICES %}
+              <option value="{{ key }}" {% if key == order.status %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+
+          <select name="delivery_person">
+            <option value="">-- None --</option>
+            {% for dp in delivery_people %}
+              <option value="{{ dp.id }}" {% if order.delivery_person and dp.id == order.delivery_person.id %}selected{% endif %}>
+                {{ dp.user.username }} ({{ dp.phone }})
+              </option>
+            {% endfor %}
+          </select>
+
+          <button type="submit" class="btn-primary">Save</button>
+        </form>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No orders.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'store/base.html' %}
+{% block title %}Not Authorized{% endblock %}
+
+{% block content %}
+<h1>Not authorized</h1>
+<p>This page is only for store owners. If you think this is a mistake, please contact the admin.</p>
+<a href="{% url 'store:home' %}" class="btn-primary">Go to Home</a>
+{% endblock %}

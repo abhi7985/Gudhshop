@@ -1,0 +1,31 @@
+{% extends 'store/base.html' %}
+{% block title %}Owner Dashboard | GudhShop{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Owner Dashboard</h1>
+
+<div class="owner-cards">
+  <a href="{% url 'store:owner_category_list' %}" class="owner-card">
+    <h2>Categories</h2>
+    <p>{{ category_count }} total</p>
+  </a>
+  <a href="{% url 'store:owner_product_list' %}" class="owner-card">
+    <h2>Products</h2>
+    <p>{{ product_count }} total</p>
+  </a>
+  <a href="{% url 'store:owner_order_list' %}" class="owner-card">
+    <h2>Orders</h2>
+  <p>View & assign delivery</p>
+</a>
+</div>
+
+
+
+<div class="owner-cards">
+  <!-- existing cards -->
+  <a href="{% url 'store:owner_deliveryperson_list' %}" class="owner-card">
+    <h2>Delivery Persons</h2>
+    <p>Manage riders and phones</p>
+  </a>
+</div>
+{% endblock %}

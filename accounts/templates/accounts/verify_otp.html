@@ -1,0 +1,15 @@
+{% extends 'store/base.html' %}
+{% block title %}Verify OTP | GudhShop{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Enter OTP</h1>
+<p>OTP sent to {{ phone }}</p>
+<form method="post" class="owner-form">
+  {% csrf_token %}
+  {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+  <label>OTP
+    <input type="text" name="otp" maxlength="6" required>
+  </label>
+  <button type="submit" class="btn-primary">Verify & Continue</button>
+</form>
+{% endblock %}

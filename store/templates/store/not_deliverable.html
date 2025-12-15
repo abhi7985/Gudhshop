@@ -1,0 +1,17 @@
+{% extends 'store/base.html' %}
+{% block title %}Not Deliverable | My Grocery{% endblock %}
+
+{% block content %}
+<div class="text-center my-5">
+  <h2 class="text-danger mb-3">Sorry, we cannot deliver to this location.</h2>
+  <p class="lead">
+    Currently we only deliver within <strong>5 km</strong> of our store location.
+  </p>
+  <p class="text-muted">
+    Try another address closer to the town centre or contact us for more details.
+  </p>
+  <a href="{% url 'store:checkout' %}" class="btn btn-outline-success mt-3">
+    Try a different address
+  </a>
+</div>
+{% endblock %}

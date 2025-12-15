@@ -1,0 +1,37 @@
+{% extends 'store/base.html' %}
+{% block title %}Manage Products | GudhShop{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Products</h1>
+<a href="{% url 'store:owner_product_create' %}" class="btn-primary">Add Product</a>
+
+<table class="owner-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Price</th>
+      <th>Stock</th>
+      <th>Active</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in products %}
+      <tr>
+        <td>{{ p.name }}</td>
+        <td>{{ p.category.name }}</td>
+        <td>₹{{ p.price }}</td>
+        <td>{{ p.stock }}</td>
+        <td>{{ p.is_active }}</td>
+        <td class="owner-actions">
+          <a href="{% url 'store:owner_product_update' p.id %}">Edit</a>
+          <a href="{% url 'store:owner_product_delete' p.id %}">Delete</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6">No products yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

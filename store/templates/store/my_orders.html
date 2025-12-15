@@ -1,0 +1,159 @@
+{% extends 'store/base.html' %}
+{% load static %}
+{% block title %}Order History | GudhShop{% endblock %}
+
+{% block content %}
+
+
+{% if not user.is_authenticated %}
+  <p>Please login to view your orders.</p>
+  <button type="button" class="btn-primary" onclick="openLoginModal()">
+    Login with OTP
+  </button>
+{% else %}
+<h1 class="page-title">Order History</h1>
+<div class="orders-layout">
+  <!-- Left: Order list -->
+  <section class="orders-list">
+    <div class="orders-filters">
+      <a href="?status=ALL" class="pill-filter {% if status_filter == 'ALL' %}active{% endif %}">All</a>
+      <a href="?status=PROCESSING" class="pill-filter {% if status_filter == 'PROCESSING' %}active{% endif %}">Processing</a>
+      <a href="?status=DELIVERED" class="pill-filter {% if status_filter == 'DELIVERED' %}active{% endif %}">Delivered</a>
+      <a href="?status=CANCELLED" class="pill-filter {% if status_filter == 'CANCELLED' %}active{% endif %}">Cancelled</a>
+    </div>
+
+    {% for order in orders %}
+      <article class="order-card">
+        <div class="order-card-top">
+          <div>
+            <div class="order-id">Order #{{ order.id }}</div>
+            <div class="order-items-count">
+              {{ order.items.count }} item{% if order.items.count != 1 %}s{% endif %}
+            </div>
+          </div>
+          <div class="order-amount-date">
+            <div class="order-date">{{ order.created_at|date:"Y-m-d" }}</div>
+            <div class="order-amount">₹ {{ order.total_amount }}</div>
+
+          </div>
+        </div>
+
+        <div class="order-card-bottom">
+          <span class="status-badge status-{{ order.status|lower }}">
+            {{ order.get_status_display }}
+          </span>
+          <a href="#" class="order-view-link" onclick="toggleDetails({{ order.id }}); return false;">
+            View Details
+          </a>
+        </div>
+
+        <div id="order-details-{{ order.id }}" class="order-details">
+          <div class="order-details-row">
+            <div>
+              <strong>Delivery Address</strong>
+              <p>{{ order.full_name }}<br>{{ order.address }}<br>{{ order.phone }}</p>
+            </div>
+            <div>
+              <strong>Payment</strong>
+              <p>{{ order.get_payment_method_display }}</p>
+              <strong>Delivery Slot</strong>
+              <p>{{ order.delivery_slot|title }}</p>
+            </div>
+          </div>
+          <div class="order-items-table">
+            {% for item in order.items.all %}
+              <div class="order-item-row">
+                <div class="order-item-main">
+                  <span class="order-item-name">{{ item.product.name }}</span>
+                  <span class="order-item-qty">{{ item.quantity }} × ₹{{ item.price_at_order }}</span>
+                </div>
+                <div class="order-item-subtotal">
+                  ₹{{ item.subtotal }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <p>You do not have any orders yet.</p>
+    {% endfor %}
+  </section>
+
+  <!-- Right: Current order status -->
+  <aside class="current-order-panel">
+    {% if current_order %}
+      <h2>Current Order Status</h2>
+      <div class="current-order-card">
+        <div class="current-order-row">
+          <span>Order ID:</span>
+          <span class="fw-bold">#{{ current_order.id }}</span>
+        </div>
+        <div class="current-order-row">
+          <span>Placed Time:</span>
+          <span>{{ current_order.created_at|date:"h:i A, M d" }}</span>
+        </div>
+        <div class="current-order-row">
+          <span>Payment:</span>
+          <span>{{ current_order.get_payment_method_display }}</span>
+        </div>
+
+        <div class="status-tracker">
+          <div class="step {% if current_order.status in 'PLACED CONFIRMED OUT_FOR_DELIVERY DELIVERED' %}done{% endif %}">
+            <span class="step-circle">1</span>
+            <span class="step-label">Order placed</span>
+          </div>
+          <div class="step {% if current_order.status in 'CONFIRMED OUT_FOR_DELIVERY DELIVERED' %}done{% endif %}">
+            <span class="step-circle">2</span>
+            <span class="step-label">Preparing</span>
+          </div>
+          <div class="step {% if current_order.status in 'OUT_FOR_DELIVERY DELIVERED' %}done{% endif %}">
+            <span class="step-circle">3</span>
+            <span class="step-label">Out for delivery</span>
+          </div>
+          <div class="step {% if current_order.status == 'DELIVERED' %}done{% endif %}">
+            <span class="step-circle">4</span>
+            <span class="step-label">Delivered</span>
+          </div>
+        </div>
+
+        <div class="current-order-row">
+          <span>Courier Info:</span>
+        </div>
+        {% if current_order.delivery_person %}
+          <div class="current-order-row">
+            <span>Name:</span>
+            <span>
+              {{ current_order.delivery_person.user.first_name|default:current_order.delivery_person.user.username }}
+            </span>
+          </div>
+          <div class="current-order-row">
+            <span>Phone:</span>
+            <span>{{ current_order.delivery_person.phone }}</span>
+          </div>
+        {% else %}
+          <div class="current-order-row">
+            <span>Name:</span>
+            <span>Not assigned yet</span>
+          </div>
+        {% endif %}
+
+        <button class="btn-primary w-100" type="button">Track Order</button>
+        <button class="btn-outline w-100" type="button">Contact Support</button>
+      </div>
+    {% else %}
+      <h2>Current Order Status</h2>
+      <p>No active orders at the moment.</p>
+    {% endif %}
+  </aside>
+</div>
+
+<script>
+function toggleDetails(orderId) {
+  const el = document.getElementById('order-details-' + orderId);
+  if (!el) return;
+  el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'store/base.html' %}
+{% block title %}Login | GudhShop{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Login / Signup with Phone</h1>
+<form method="post" class="owner-form">
+  {% csrf_token %}
+  {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+  <label>Mobile Number (E.g. +91XXXXXXXXXX)
+    <input type="tel" name="phone" required>
+  </label>
+  <button type="submit" class="btn-primary">Send OTP</button>
+</form>
+{% endblock %}

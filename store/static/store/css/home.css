@@ -1,0 +1,494 @@
+/* ---------- HERO SECTION ---------- */
+
+.hero {
+  padding: 40px 0 48px;
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: center;
+
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 32px 40px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.hero-heading {
+  font-size: 38px;
+  line-height: 1.25;
+  font-weight: 800;
+  margin: 0 0 18px;
+  color: #111827;
+}
+
+.hero-subtitle {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #6b7280;
+  margin: 0 0 24px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+}
+
+/* you probably already have .btn-primary/.btn-link;
+   these are only for looks similar to Visily */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  background: #22c55e;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background: #16a34a;
+}
+
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  color: #111827;
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  border-color: #9ca3af;
+}
+
+.hero-illustration img {
+  width: 100%;
+  max-width: 440px;
+  display: block;
+  margin-left: auto;
+}
+
+
+/* ---------- CATEGORY STRIP ---------- */
+
+.category-strip {
+  background: transparent;
+  padding: 28px 0 20px;
+}
+
+.category-strip-inner {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+/* Card-like pill with icon on top, label below */
+.category-pill {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  text-decoration: none;
+  color: #111827;
+  font-size: 13px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease,
+              transform 0.15s ease;
+}
+
+.category-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10);
+}
+
+.category-pill.active {
+  border-color: #16a34a;
+  box-shadow: 0 12px 26px rgba(22, 163, 74, 0.25);
+}
+
+.category-pill-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-pill-icon img {
+  max-width: 34px;
+  max-height: 34px;
+  object-fit: contain;
+}
+
+.category-pill span {
+  white-space: nowrap;
+}
+
+
+/* ---------- PRODUCT SECTION ---------- */
+
+.product-section {
+  padding: 24px 0 48px;
+}
+
+.product-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 22px;
+  color: #111827;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 22px;
+}
+
+.product-card {
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+}
+
+.product-image {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+.product-body {
+  padding: 12px 14px 14px;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 2px;
+  color: #111827;
+}
+
+.product-unit {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 0 10px;
+}
+
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+/* Cart controls – matches “Add” / quantity style */
+
+.cart-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-add {
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: none;
+  background-color: #22c55e;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-add:hover {
+  background-color: #16a34a;
+  transform: translateY(-1px);
+}
+
+/* If you want a round “+” like in the Visily mobile design,
+   uncomment this block:
+
+.btn-add {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 0;
+}
+.btn-add::before {
+  content: "+";
+  font-size: 18px;
+  font-weight: 700;
+}
+*/
+
+.qty-control {
+  display: none;       /* initially hidden; your JS can show it */
+  align-items: center;
+  gap: 6px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  padding: 4px 8px;
+}
+
+.qty-btn {
+  border: none;
+  background: transparent;
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #111827;
+}
+
+.qty-value {
+  min-width: 18px;
+  text-align: center;
+  font-size: 13px;
+}
+
+
+/* ---------- RESPONSIVE ---------- */
+
+/* Tablet */
+@media (max-width: 992px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    padding: 24px 20px;
+    gap: 24px;
+  }
+
+  .hero-illustration img {
+    margin: 0 auto;
+    max-width: 360px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .product-image {
+    height: 170px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .page-main.container {
+    padding-top: 16px;
+  }
+
+  .hero {
+    padding: 16px 0 20px;
+  }
+
+  .hero-inner {
+    padding: 20px 16px;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.16);
+  }
+
+  .hero-heading {
+    font-size: 24px;
+  }
+
+  .hero-subtitle {
+    font-size: 13px;
+  }
+
+  .hero-actions {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .hero-illustration {
+    display: none;   /* like your Visily mobile screen */
+  }
+
+  .category-strip {
+    padding: 18px 0 12px;
+  }
+
+  .category-pill {
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .category-pill-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .category-pill-icon img {
+    max-width: 28px;
+    max-height: 28px;
+  }
+
+  .product-section {
+    padding-top: 16px;
+  }
+
+  .product-header h2 {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .product-card {
+    border-radius: 18px;
+  }
+
+  .product-image {
+    height: 135px;
+  }
+
+  .product-body {
+    padding: 8px 10px 10px;
+  }
+
+  .product-name {
+    font-size: 13px;
+  }
+
+  .product-unit {
+    font-size: 11px;
+  }
+
+  .product-price {
+    font-size: 13px;
+  }
+
+  .btn-add {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .qty-control {
+    transform: scale(0.92);
+  }
+}
+
+
+
+/*  Product list css */
+
+/* ---------- TITLE + SEARCH (DESKTOP/TABLET) ---------- */
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 18px;
+  float: left;              /* left side */
+  line-height: 40px;        /* vertically centers with input */
+}
+
+.product-topbar {
+  display: flex;            /* search box + button inline */
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+/* search form stays as before */
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-form input {
+  padding: 8px 14px 8px 34px;    /* extra left for icon */
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  min-width: 260px;
+  font-size: 13px;
+  outline: none;
+  background-color: #ffffff;
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 14px 14px;
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='11' cy='11' r='6.5' stroke='%2394A3B8' stroke-width='1.5'/%3E%3Cpath d='M15.5 15.5L19 19' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.search-form input::placeholder {
+  color: #9ca3af;
+}
+
+.search-form button {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: none;
+  background: var(--green);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* make sure stuff below starts under the floated title */
+.category-strip {
+  clear: both;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 640px) {
+  /* hide the title on mobile like your design */
+  .page-title {
+    display: none;
+    float: none;
+  }
+
+  .product-topbar {
+    display: block;
+    margin: 10px 0 14px;
+  }
+
+  .search-form {
+    width: 100%;
+  }
+
+  .search-form input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .search-form button {
+    padding: 8px 16px;
+  }
+}

@@ -1,0 +1,104 @@
+{% extends 'store/base.html' %}
+{% block title %}Checkout | My Grocery{% endblock %}
+
+{% block content %}
+<h2 class="h4 mb-3">Checkout</h2>
+
+<div class="row g-4">
+  <div class="col-md-7">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="full_name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Phone</label>
+        <input type="tel" name="phone" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Delivery Address</label>
+        <textarea name="address" class="form-control" rows="3" required></textarea>
+        <div class="form-text">
+          Add house number, street, landmark, area.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Delivery Slot</label>
+        <select name="slot" class="form-select" required>
+          <option value="">Select a slot</option>
+          <option value="morning">Morning (8 AM – 11 AM)</option>
+          <option value="afternoon">Afternoon (12 PM – 4 PM)</option>
+          <option value="evening">Evening (5 PM – 9 PM)</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label d-block">Payment Method</label>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="payment_method"
+                 id="cod" value="COD" checked>
+          <label class="form-check-label" for="cod">Cash on Delivery</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="payment_method"
+                 id="online" value="ONLINE">
+          <label class="form-check-label" for="online">Online (Coming Soon)</label>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label d-block">Location (for 5 km check)</label>
+        <button type="button" class="btn btn-outline-success btn-sm"
+                onclick="captureLocation()">
+          Use My Current Location
+        </button>
+        <div id="coords-display" class="small mt-1 text-primary"></div>
+
+        <div class="form-text" id="location-status">
+          We use your location only to check if delivery is possible (within 5 km).
+        </div>
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+      </div>
+
+      <button type="submit" class="btn btn-success btn-lg">
+        Place Order
+      </button>
+    </form>
+  </div>
+
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header bg-light">
+        <strong>Order Summary</strong>
+      </div>
+      <div class="card-body">
+        {% for item in cart_items %}
+          <div class="d-flex justify-content-between mb-2">
+            <div>
+              <div class="small fw-semibold">{{ item.product.name }}</div>
+              <div class="small text-muted">Qty: {{ item.quantity }}</div>
+            </div>
+            <div class="small fw-semibold">
+              ₹{{ item.subtotal }}
+            </div>
+          </div>
+        {% endfor %}
+        <hr>
+        <div class="d-flex justify-content-between">
+          <span class="fw-bold">Total</span>
+          <span class="fw-bold">₹{{ cart_total }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // If you prefer, you can move this into location.js
+</script>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends 'store/base.html' %}
+{% load static %}
+{% block title %}Cart | MyGrocery{% endblock %}
+
+{% block content %}
+<h1 class="page-title">My Cart</h1>
+
+<div class="cart-layout">
+  <section class="cart-items">
+    {% if cart_items %}
+      {% for item in cart_items %}
+        <article class="cart-row">
+          <div class="cart-product">
+            {% if item.product.image %}
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+            {% else %}
+              <img src="{% static 'store/images/product-placeholder.png' %}" alt="{{ item.product.name }}">
+            {% endif %}
+            <div>
+              <h3>{{ item.product.name }}</h3>
+              <p class="cart-unit">₹{{ item.product.price }} / {{ item.product.unit|default:"unit" }}</p>
+            </div>
+          </div>
+          <div class="cart-qty">
+            <a href="{% url 'store:update_cart' item.id 'decrease' %}">-</a>
+            <span>{{ item.quantity }}</span>
+            <a href="{% url 'store:update_cart' item.id 'increase' %}">+</a>
+          </div>
+          <div class="cart-price">₹{{ item.subtotal }}</div>
+          <a class="cart-remove" href="{% url 'store:remove_from_cart' item.id %}">Remove</a>
+        </article>
+      {% endfor %}
+
+      <div class="cart-totals">
+        <div class="cart-totals-row">
+          <span>Items ({{ total_items }})</span>
+          <span>₹{{ cart_total }}</span>
+        </div>
+        <div class="cart-totals-row">
+          <span>Delivery Fee</span>
+          <span>₹{{ delivery_fee }}</span>
+        </div>
+        <div class="cart-totals-row cart-grand">
+          <span>Grand Total</span>
+          <span>₹{{ grand_total }}</span>
+        </div>
+        <a href="{% url 'store:product_list' %}" class="cart-link">Continue Shopping</a>
+      </div>
+    {% else %}
+      <p>Your cart is empty.</p>
+      <a href="{% url 'store:product_list' %}" class="btn-primary">Start Shopping</a>
+    {% endif %}
+  </section>
+
+  <section class="checkout-panel">
+    <h2>Checkout Information</h2>
+
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'store:checkout' %}">
+        {% csrf_token %}
+        <label>Full Name
+          <input type="text" name="full_name" required>
+        </label>
+        <label>Phone Number
+          <input type="tel" name="phone" required>
+        </label>
+        <label>Delivery Address
+          <textarea name="address" rows="3" required></textarea>
+        </label>
+
+        <button type="button" class="btn-location" onclick="detectLocationAndShowMap()">
+          Use my current location
+        </button>
+        <p class="location-note">We deliver within 5km of your current location.</p>
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+
+        <div id="map" style="width:100%;height:250px;margin-top:10px;border-radius:12px;display:none;"></div>
+
+
+        <label>Delivery Slot
+          <select name="slot" required>
+            <option value="">Select a slot</option>
+            <option value="morning">Morning</option>
+            <option value="afternoon">Afternoon</option>
+            <option value="evening">Evening</option>
+          </select>
+        </label>
+
+        <fieldset class="pay-method">
+          <legend>Payment Method</legend>
+          <label>
+            <input type="radio" name="payment_method" value="COD" checked>
+            Cash on Delivery
+          </label>
+          <label>
+            <input type="radio" name="payment_method" value="ONLINE">
+            Online Payment
+          </label>
+        </fieldset>
+
+        <div class="checkout-summary">
+          <div class="cart-totals-row">
+            <span>Cart Subtotal</span>
+            <span>₹{{ cart_total }}</span>
+          </div>
+          <div class="cart-totals-row">
+            <span>Delivery Fee</span>
+            <span>₹{{ delivery_fee }}</span>
+          </div>
+          <div class="cart-totals-row cart-grand">
+            <span>Total to Pay</span>
+            <span>₹{{ grand_total }}</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary btn-place">Place Order</button>
+      </form>
+    {% else %}
+      <p>You need to login to place an order.</p>
+      <button type="button" class="btn-primary btn-place"
+              onclick="openLoginModal()">Login with OTP</button>
+    {% endif %}
+  </section>
+</div>
+
+<script>
+const STORE_LAT = 25.3176;   // Varanasi example
+const STORE_LNG = 82.9739;
+const MAX_KM = 5;            // 5 km radius
+
+function haversineKm(lat1,lng1,lat2,lng2) {
+  const toRad = d => d * Math.PI / 180;
+  const R = 6371;
+  const dLat = toRad(lat2-lat1);
+  const dLng = toRad(lng2-lng1);
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function detectLocationAndShowMap() {
+  if (!navigator.geolocation) {
+    alert("Location not supported on this browser.");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function (position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      document.getElementById('latitude').value = lat;
+      document.getElementById('longitude').value = lng;
+
+      const dist = haversineKm(STORE_LAT, STORE_LNG, lat, lng);
+      if (dist > MAX_KM) {
+        alert("Sorry, delivery is only available within " + MAX_KM + " km of our store.");
+      } else {
+        alert("Delivery available at your location (~" + dist.toFixed(1) + " km).");
+      }
+
+      showMap(lat, lng);
+    },
+    function (error) {
+      console.log('Geolocation error', error);
+      let msg = "Could not get location. ";
+      if (error.code === 1) msg += "Permission denied in browser settings.";
+      else if (error.code === 2) msg += "Position unavailable.";
+      else if (error.code === 3) msg += "Request timed out.";
+      alert(msg);
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+function showMap(lat, lng) {
+  const mapDiv = document.getElementById('map');
+  mapDiv.style.display = 'block';
+
+  const pos = {lat: lat, lng: lng};
+
+  if (!gmap) {
+    gmap = new google.maps.Map(mapDiv, {
+      zoom: 15,
+      center: pos,
+    });
+    gmarker = new google.maps.Marker({
+      position: pos,
+      map: gmap,
+      draggable: true,
+    });
+
+    gmarker.addListener('dragend', function (e) {
+      const newLat = e.latLng.lat();
+      const newLng = e.latLng.lng();
+      document.getElementById('latitude').value = newLat;
+      document.getElementById('longitude').value = newLng;
+    });
+  } else {
+    gmap.setCenter(pos);
+    gmarker.setPosition(pos);
+  }
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'store/base.html' %}
+{% load static %}
+{% load cart_extras %}
+{% block title %}Shop Groceries | MyGrocery{% endblock %}
+
+{% block content %}
+
+
+<div class="product-topbar">
+  <form class="search-form" method="get">
+    <input type="text" name="q" placeholder="Search items..." value="{{ search_query }}">
+    {% if active_category %}
+      <input type="hidden" name="category" value="{{ active_category }}">
+    {% endif %}
+    <button type="submit">Search</button>
+  </form>
+</div>
+
+<section class="category-strip">
+  <div class="category-strip-inner">
+    <a href="{% url 'store:product_list' %}"
+       class="category-pill {% if not active_category %}active{% endif %}">
+      <div class="category-pill-icon">
+        <img src="{% static 'store/images/cat-all.png' %}" alt="All">
+      </div>
+      <span>All</span>
+    </a>
+    {% for cat in categories %}
+      <a href="?category={{ cat.slug }}{% if search_query %}&q={{ search_query }}{% endif %}"
+         class="category-pill {% if active_category == cat.slug %}active{% endif %}">
+        <div class="category-pill-icon">
+          {% if cat.image %}
+            <img src="{{ cat.image.url }}" alt="{{ cat.name }}">
+          {% else %}
+            <img src="{% static 'store/images/cat-placeholder.png' %}" alt="{{ cat.name }}">
+          {% endif %}
+        </div>
+        <span>{{ cat.name }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="product-grid">
+  {% for product in products %}
+    <article class="product-card">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+      {% else %}
+        <img src="{% static 'store/images/product-placeholder.png' %}" alt="{{ product.name }}" class="product-image">
+      {% endif %}
+      <div class="product-body">
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="product-unit">{{ product.unit|default:"1 pc" }}</p>
+        <div class="product-footer"
+            data-product-id="{{ product.id }}"
+            data-initial-qty="{{ cart_quantities|get_item:product.id }}">
+          <span class="product-price">₹{{ product.price }}</span>
+
+          <div class="cart-control">
+            <button type="button" class="btn-add js-add-to-cart">Add</button>
+            <div class="qty-control js-qty-control">
+              <button type="button" class="qty-btn js-decrease">-</button>
+              <span class="qty-value js-qty">0</span>
+              <button type="button" class="qty-btn js-increase">+</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </article>
+  {% empty %}
+    <p>No products found.</p>
+  {% endfor %}
+</div>
+{% endblock %}

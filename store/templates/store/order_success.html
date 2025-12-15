@@ -1,0 +1,17 @@
+{% extends 'store/base.html' %}
+{% block title %}Order Placed | My Grocery{% endblock %}
+
+{% block content %}
+<div class="text-center my-5">
+  <h2 class="text-success mb-3">Thank you! Your order is placed.</h2>
+  <p class="lead">
+    Order ID: <strong>#{{ order.id }}</strong>
+  </p>
+  <p class="text-muted">
+    You will receive your groceries in the selected delivery slot.
+  </p>
+  <a href="{% url 'store:product_list' %}" class="btn btn-success mt-3">
+    Continue Shopping
+  </a>
+</div>
+{% endblock %}

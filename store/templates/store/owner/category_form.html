@@ -1,0 +1,11 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ title }} | GudhShop{% endblock %}
+
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+<form method="post" enctype="multipart/form-data" class="owner-form">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn-primary">Save</button>
+</form>
+{% endblock %}

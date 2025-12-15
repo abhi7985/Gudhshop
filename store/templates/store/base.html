@@ -1,0 +1,364 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}GudhShop{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{% static 'store/css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'store/css/home.css' %}">
+  <script async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCI4rOLCMrOrJIHJx6f-pmqco8OhQEbfTM&callback=initGmap"
+  defer></script>
+
+</head>
+<body>
+<header class="main-nav">
+  <div class="main-nav-inner container">
+    <a href="{% url 'store:home' %}" class="nav-logo">
+      <img src="{% static 'store/images/logo.png' %}" alt="MyGrocery">
+      <span>GudhShop</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="{% url 'store:home' %}">Home</a>
+      <a href="{% url 'store:product_list' %}">Shop</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'store:my_orders' %}">My Orders</a>
+      {% endif %}
+      <a href="#">About Us</a>
+      <a href="#">Contact</a>
+    </nav>
+
+    <div class="nav-right">
+      <a href="{% url 'store:cart' %}" class="nav-cart">
+        🛒
+        <span id="cart-count" class="cart-count">{{ cart_count|default:0 }}</span>
+      </a>
+      {% if user.is_authenticated %}
+        <span class="nav-user">{{ user.username }}</span>
+        <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn-login-outline">Logout</button>
+        </form>
+      {% else %}
+        <button type="button" class="btn-login" onclick="openLoginModal()">Login / Account</button>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<main class="page-main container">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="page-footer">
+  <div class="container">
+    <small>© {{ year|default:2025 }} MyGrocery</small>
+  </div>
+</footer>
+
+
+<div id="login-modal" class="login-modal">
+  <div class="login-modal-backdrop"></div>
+  <div class="login-modal-content">
+    <button class="login-modal-close" type="button" onclick="closeLoginModal()">×</button>
+
+    <!-- STEP 1: phone -->
+    <div id="login-step-phone">
+      <h2>Login with OTP</h2>
+      <p>Enter your mobile number to receive an OTP.</p>
+      <form id="phone-form">
+        {% csrf_token %}
+        <input type="tel" name="phone" id="login-phone-input"
+               placeholder="Enter mobile number" required>
+        <button type="submit" class="btn-primary w-100">Send OTP</button>
+      </form>
+      <p id="login-phone-error" class="login-error"></p>
+    </div>
+
+    <!-- STEP 2: otp -->
+    <div id="login-step-otp" style="display:none;">
+      <h2>Verify OTP</h2>
+      <p>We sent a code to <span id="login-phone-display"></span></p>
+      <form id="otp-form">
+        {% csrf_token %}
+        <input type="text" name="otp" id="login-otp-input"
+               maxlength="6" placeholder="Enter OTP" required>
+        <button type="submit" class="btn-primary w-100">Verify & Login</button>
+      </form>
+      <p id="login-otp-error" class="login-error"></p>
+      <button type="button" class="btn-link" onclick="backToPhoneStep()">Change number</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+const CSRFTOKEN = getCookie('csrftoken');
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const cartCountEl = document.getElementById('cart-count');
+
+  function updateCartCount(count) {
+    if (cartCountEl) cartCountEl.textContent = count;
+  }
+
+  document.querySelectorAll('.product-footer').forEach(function (footer) {
+    const productId = footer.getAttribute('data-product-id');
+    const initialQty = parseInt(footer.getAttribute('data-initial-qty') || '0', 10);
+
+    const addBtn = footer.querySelector('.js-add-to-cart');
+    const qtyControl = footer.querySelector('.js-qty-control');
+    const qtySpan = footer.querySelector('.js-qty');
+    const btnInc = footer.querySelector('.js-increase');
+    const btnDec = footer.querySelector('.js-decrease');
+
+    if (!productId || !addBtn || !qtyControl) return;
+
+    // initialise based on server data
+    if (initialQty > 0) {
+      addBtn.style.display = 'none';
+      qtyControl.style.display = 'inline-flex';
+      qtySpan.textContent = initialQty;
+    } else {
+      addBtn.style.display = 'inline-flex';
+      qtyControl.style.display = 'none';
+    }
+
+    addBtn.addEventListener('click', function () {
+      fetch("{% url 'store:api_add_to_cart' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': CSRFTOKEN,
+        },
+        body: new URLSearchParams({product_id: productId})
+      }).then(r => r.json()).then(data => {
+        if (!data.ok) return;
+        addBtn.style.display = 'none';
+        qtyControl.style.display = 'inline-flex';
+        qtySpan.textContent = data.quantity;
+        updateCartCount(data.cart_count);
+      });
+    });
+
+    btnInc.addEventListener('click', function () {
+      fetch("{% url 'store:api_update_cart' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': CSRFTOKEN,
+        },
+        body: new URLSearchParams({product_id: productId, action: 'increase'})
+      }).then(r => r.json()).then(data => {
+        if (!data.ok) return;
+        qtySpan.textContent = data.quantity;
+        updateCartCount(data.cart_count);
+      });
+    });
+
+    btnDec.addEventListener('click', function () {
+      fetch("{% url 'store:api_update_cart' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': CSRFTOKEN,
+        },
+        body: new URLSearchParams({product_id: productId, action: 'decrease'})
+      }).then(r => r.json()).then(data => {
+        if (!data.ok) return;
+        if (data.quantity <= 0) {
+          qtyControl.style.display = 'none';
+          addBtn.style.display = 'inline-flex';
+        } else {
+          qtySpan.textContent = data.quantity;
+        }
+        updateCartCount(data.cart_count);
+      });
+    });
+  });
+});
+</script>
+
+
+<script>
+function openLoginModal() {
+  const m = document.getElementById('login-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.getElementById('login-step-phone').style.display = 'block';
+  document.getElementById('login-step-otp').style.display = 'none';
+  document.getElementById('login-phone-error').textContent = '';
+  document.getElementById('login-otp-error').textContent = '';
+}
+
+function closeLoginModal() {
+  const m = document.getElementById('login-modal');
+  if (m) m.classList.remove('show');
+}
+
+function backToPhoneStep() {
+  document.getElementById('login-step-phone').style.display = 'block';
+  document.getElementById('login-step-otp').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const phoneForm = document.getElementById('phone-form');
+  const otpForm = document.getElementById('otp-form');
+
+  if (phoneForm) {
+    phoneForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const phone = document.getElementById('login-phone-input').value.trim();
+      const errEl = document.getElementById('login-phone-error');
+      errEl.textContent = '';
+
+      fetch("{% url 'accounts:phone_login' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': CSRFTOKEN,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: new URLSearchParams({phone: phone})
+      }).then(r => r.json()).then(data => {
+        if (!data.ok) {
+          errEl.textContent = data.error || 'Could not send OTP.';
+          return;
+        }
+        document.getElementById('login-step-phone').style.display = 'none';
+        document.getElementById('login-step-otp').style.display = 'block';
+        document.getElementById('login-phone-display').textContent = phone;
+      }).catch(() => {
+        errEl.textContent = 'Network error. Try again.';
+      });
+    });
+  }
+
+  if (otpForm) {
+    otpForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const otp = document.getElementById('login-otp-input').value.trim();
+      const errEl = document.getElementById('login-otp-error');
+      errEl.textContent = '';
+
+      fetch("{% url 'accounts:verify_otp' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': CSRFTOKEN,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: new URLSearchParams({otp: otp})
+      }).then(r => r.json()).then(data => {
+        if (!data.ok) {
+          errEl.textContent = data.error || 'Invalid OTP.';
+          return;
+        }
+        // success: reload page so header/account/cart update
+        closeLoginModal();
+        window.location.reload();
+      }).catch(() => {
+        errEl.textContent = 'Network error. Try again.';
+      });
+    });
+  }
+});
+</script>
+
+
+
+<script>
+let gmap, gmarker;
+
+function initGmap() {
+  // Called by Google script; just keep reference
+  console.log('Google Maps loaded');
+}
+</script>
+
+
+
+
+
+<script>
+let gmap, gmarker;
+
+function initGmap() {
+  const mapDiv = document.getElementById('location-map');
+  if (!mapDiv) return;
+  const center = {lat: {{ STORE_LAT|default:'25.4358' }}, lng: {{ STORE_LNG|default:'81.8463' }}};
+  gmap = new google.maps.Map(mapDiv, {center: center, zoom: 13});
+  gmarker = new google.maps.Marker({position: center, map: gmap, draggable: true});
+
+  gmarker.addListener('dragend', function(e) {
+    sendLocationToServer(e.latLng.lat(), e.latLng.lng());
+  });
+}
+
+function detectLocationAndShowMap() {
+  if (!navigator.geolocation) {
+    alert("Location not supported on this browser.");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      if (gmap && gmarker) {
+        const p = {lat: lat, lng: lng};
+        gmap.setCenter(p);
+        gmarker.setPosition(p);
+      }
+      sendLocationToServer(lat, lng);
+    },
+    err => {
+      console.log('Geolocation error', err);
+      alert("Could not get location. Please check location permission.");
+    },
+    {enableHighAccuracy: true, timeout: 15000, maximumAge: 0}
+  );
+}
+
+function sendLocationToServer(lat, lng) {
+  fetch("{% url 'store:api_check_delivery' %}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': CSRFTOKEN,
+    },
+    body: new URLSearchParams({lat: lat, lng: lng})
+  }).then(r => r.json()).then(data => {
+    const msgEl = document.getElementById('location-message');
+    if (!msgEl) return;
+    if (data.ok) {
+      msgEl.textContent = "Great! We can deliver here (~" + data.distance_km + " km from store).";
+      // reload home showing full UI
+      setTimeout(() => window.location.reload(), 800);
+    } else {
+      msgEl.textContent = "Sorry, delivery not available at this exact location (" +
+                          data.distance_km + " km away). Try moving the pin closer.";
+    }
+  }).catch(() => {
+    alert("Network error checking delivery area.");
+  });
+}
+</script>
+
+</body>
+</html>

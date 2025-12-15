@@ -1,0 +1,17 @@
+{% extends 'store/base.html' %}
+{% block title %}Delivery Login{% endblock %}
+
+{% block content %}
+<h1>Delivery Person Login</h1>
+<form method="post" class="owner-form">
+  {% csrf_token %}
+  {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+  <label>Username
+    <input type="text" name="username" required>
+  </label>
+  <label>Password
+    <input type="password" name="password" required>
+  </label>
+  <button type="submit" class="btn-primary">Login</button>
+</form>
+{% endblock %}
