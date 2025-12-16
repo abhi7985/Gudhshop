@@ -40,6 +40,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.ngrok-free.app",
     "https://*.ngrok-free.dev",
     "https://gudhshop-production.up.railway.app",
+    "https://web-production-7c714.up.railway.app",
 ]
 
 # ---------- Applications ----------
