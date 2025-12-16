@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get(
     "django-insecure-3gwyedtum207lx*)a)ejp-$ip1)x2r_)l72#01h_^e^$pu&!gs",
 )
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "localhost",
