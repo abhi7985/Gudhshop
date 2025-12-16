@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
     ".ngrok-free.app",
     ".ngrok-free.dev",
     "gudhshop-production.up.railway.app",
+    "web-production-7c714.up.railway.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
