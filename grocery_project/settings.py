@@ -8,6 +8,7 @@ import json
 
 import firebase_admin
 from firebase_admin import credentials, auth as firebase_auth
+import dj_database_url
 
 # Twilio from env
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
@@ -97,6 +98,11 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+if 'DATABASE_URL' in os.environ:
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
 
 # ---------- Password validation ----------
 
