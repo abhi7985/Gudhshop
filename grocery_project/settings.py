@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "store.apps.StoreConfig",
     "accounts",
     "delivery",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [

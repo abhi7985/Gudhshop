@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import api_views
 
 app_name = 'store'
 
@@ -41,5 +42,11 @@ urlpatterns = [
     path('owner/delivery-persons/<int:pk>/delete/', views.owner_deliveryperson_delete, name='owner_deliveryperson_delete'),
 
 
+
+    # API endpoints for mobile app
+    path("api/categories/", api_views.api_categories, name="api_categories"),
+    path("api/products/", api_views.api_products, name="api_products"),
+    path("api/orders/", api_views.api_orders_list, name="api_orders_list"),
+    path("api/orders/create/", api_views.api_orders_create, name="api_orders_create"),
 
 ]
