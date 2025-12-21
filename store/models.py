@@ -92,8 +92,9 @@ class OrderItem(models.Model):
 
     @property
     def subtotal(self):
+        if self.price_at_order is None or self.quantity is None:
+            return 0
         return self.price_at_order * self.quantity
-
 
 class StoreLocation(models.Model):
     name = models.CharField(max_length=100, default='Main Store')

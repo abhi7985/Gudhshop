@@ -26,9 +26,8 @@ class CartItemAdmin(admin.ModelAdmin):
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    readonly_fields = ("product", "quantity", "price_at_order")
-    can_delete = False
     extra = 0
+    readonly_fields = ("product", "quantity", "price_at_order", "subtotal")
 
 
 # @admin.register(Order)
@@ -41,10 +40,12 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'status', 'delivery_person', 'created_at')
-    list_filter = ('status',)
-    search_fields = ('user__username', 'delivery_person__user__username')
-    list_editable = ('status', 'delivery_person')
+    list_display = ("id", "user", "status", "delivery_person", "created_at")
+    list_filter = ("status",)
+    search_fields = ("user__username", "delivery_person__user__username")
+    list_editable = ("status", "delivery_person")
+    inlines = [OrderItemInline]   # <-- show order items on the order page
+
 
 @admin.register(StoreLocation)
 class StoreLocationAdmin(admin.ModelAdmin):
