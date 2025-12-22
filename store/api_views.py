@@ -46,38 +46,22 @@ def api_orders_list(request):
 
 
 @api_view(["POST"])
-@permission_classes([AllowAny])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def api_orders_create(request):
-    """
-    Create order from app checkout.
-    Expected JSON:
-    {
-      "full_name": "...",
-      "phone": "...",
-      "address": "...",
-      "payment_method": "COD",
-      "delivery_slot": "morning",
-      "items": [
-        {"product_id": 1, "quantity": 2},
-        {"product_id": 5, "quantity": 1}
-      ]
-    }
-    """
     data = request.data
-
     items_data = data.get("items") or []
     if not items_data:
-        return Response(
-            {"detail": "No items provided."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response({"detail": "No items provided."},
+                        status=status.HTTP_400_BAD_REQUEST)
 
+    # request.user is now the authenticated user from token
     order = Order.objects.create(
-        user=request.user if request.user.is_authenticated else None,
+        user=request.user,
         full_name=data.get("full_name", ""),
         phone=data.get("phone", ""),
         address=data.get("address", ""),
-        latitude=None,   # app will send later when you add map
+        latitude=None,
         longitude=None,
         payment_method=data.get("payment_method", "COD"),
         status="PLACED",
@@ -89,7 +73,6 @@ def api_orders_create(request):
         qty = int(item.get("quantity", 1))
         if not product_id or qty <= 0:
             continue
-
         try:
             product = Product.objects.get(id=product_id, is_active=True)
         except Product.DoesNotExist:
@@ -101,6 +84,6 @@ def api_orders_create(request):
             quantity=qty,
             price_at_order=product.price,
         )
-#nothing changed here
+
     serializer = OrderSerializer(order)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
