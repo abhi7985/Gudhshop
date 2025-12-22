@@ -53,9 +53,12 @@ def api_orders_create(request):
     data = request.data
     items_data = data.get("items") or []
     if not items_data:
-        return Response({"detail": "No items provided."},
-                        status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"detail": "No items provided."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
+    # Address lookup
     address_id = data.get("address_id")
     address_obj = None
 
@@ -63,7 +66,7 @@ def api_orders_create(request):
         try:
             address_obj = Address.objects.get(id=address_id, user=request.user)
         except Address.DoesNotExist:
-            pass
+            address_obj = None
 
     if address_obj:
         full_name = address_obj.full_name
@@ -78,6 +81,7 @@ def api_orders_create(request):
         lat = None
         lng = None
 
+    # SINGLE order creation
     order = Order.objects.create(
         user=request.user,
         address_obj=address_obj,
@@ -91,27 +95,7 @@ def api_orders_create(request):
         delivery_slot=data.get("delivery_slot", "morning"),
     )
 
-    # items loop unchanged...
-
-    data = request.data
-    items_data = data.get("items") or []
-    if not items_data:
-        return Response({"detail": "No items provided."},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    # request.user is now the authenticated user from token
-    order = Order.objects.create(
-        user=request.user,
-        full_name=data.get("full_name", ""),
-        phone=data.get("phone", ""),
-        address=data.get("address", ""),
-        latitude=None,
-        longitude=None,
-        payment_method=data.get("payment_method", "COD"),
-        status="PLACED",
-        delivery_slot=data.get("delivery_slot", "morning"),
-    )
-
+    # Items loop (once, for this order)
     for item in items_data:
         product_id = item.get("product_id")
         qty = int(item.get("quantity", 1))
