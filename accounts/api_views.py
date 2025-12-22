@@ -11,6 +11,7 @@ twilio_client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 
 @csrf_exempt
 def send_otp(request):
+    print("send_otp called",settings.TWILIO_ACCOUNT_SID)
     if request.method != "POST":
         return JsonResponse({"detail": "POST required"}, status=405)
 
@@ -47,7 +48,7 @@ def verify_otp(request):
         return JsonResponse({"success": False, "detail": "Invalid code"}, status=400)
 
     # Get or create user
-    user, _ = User.objects.get_or_create(username=phone, defaults={"phone": phone})
+    user, _ = User.objects.get_or_create(username=phone)
 
     # Example: using DRF TokenAuth; adjust to your auth system
     from rest_framework.authtoken.models import Token
