@@ -25,6 +25,8 @@ urlpatterns = [
     path('', include('store.urls')),  # Root URLs handled by store app
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('delivery/', include('delivery.urls', namespace='delivery')),
+    path("api/auth/", include("accounts.urls")),
+
 
 ]
 
