@@ -2,6 +2,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import authentication_classes, permission_classes
 
 from .models import Category, Product, Order, OrderItem
 from .api_serializers import (
@@ -34,15 +37,12 @@ def api_products(request):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def api_orders_list(request):
-    """
-    For now returns ALL orders (no login).
-    Later you will filter by request.user when you add login.
-    """
-    qs = Order.objects.order_by("-created_at")
+    qs = Order.objects.filter(user=request.user).order_by("-created_at")
     serializer = OrderSerializer(qs, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.data)
 
 
 @api_view(["POST"])
