@@ -49,4 +49,10 @@ urlpatterns = [
     path("api/orders/", api_views.api_orders_list, name="api_orders_list"),
     path("api/orders/create/", api_views.api_orders_create, name="api_orders_create"),
 
+
+
+    path("api/addresses/", api_views.api_address_list, name="api_address_list"),
+    path("api/addresses/create/", api_views.api_address_create, name="api_address_create"),
+    # Order detail
+    path("api/orders/<int:order_id>/", api_views.api_order_detail, name="api_order_detail"),
 ]

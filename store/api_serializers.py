@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Category, Product, Order, OrderItem
+from .models import Category, Product, Order, OrderItem,Address
+
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -39,12 +40,23 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "subtotal",
         ]
 
-
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = [
+            "id",
+            "full_name",
+            "phone",
+            "address_line",
+            "latitude",
+            "longitude",
+            "is_default",
+        ]
+        
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
-    total_amount = serializers.DecimalField(
-        max_digits=10, decimal_places=2, read_only=True
-    )
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    address_obj = AddressSerializer(read_only=True)
 
     class Meta:
         model = Order
@@ -61,4 +73,9 @@ class OrderSerializer(serializers.ModelSerializer):
             "created_at",
             "total_amount",
             "items",
+            "address_obj",   # NEW
         ]
+
+        
+
+

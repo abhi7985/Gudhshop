@@ -39,6 +39,18 @@ class CartItem(models.Model):
         return self.product.price * self.quantity
 
 
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
+    full_name = models.CharField(max_length=120)
+    phone = models.CharField(max_length=15)
+    address_line = models.TextField()
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.full_name} - {self.address_line[:30]}"
 
 class Order(models.Model):
     PAYMENT_CHOICES = (
@@ -54,6 +66,13 @@ class Order(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    address_obj = models.ForeignKey(
+        Address,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='orders'
+    )
     full_name = models.CharField(max_length=120)
     phone = models.CharField(max_length=15)
     address = models.TextField()
@@ -104,3 +123,6 @@ class StoreLocation(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+

@@ -50,3 +50,5 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(StoreLocation)
 class StoreLocationAdmin(admin.ModelAdmin):
     list_display = ("name", "latitude", "longitude", "delivery_radius_km")
+    
+
